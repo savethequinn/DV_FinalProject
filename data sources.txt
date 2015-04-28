@@ -1,0 +1,5 @@
+https://app.enigma.io/table/us.gov.medicare.hospital-compare?row=0&col=4&page=1
+
+https://app.enigma.io/table/us.gov.medicare.cms.provider-charges.2011?row=0&col=5&page=1
+
+http://kff.org/health-reform/state-indicator/state-activity-around-expanding-medicaid-under-the-affordable-care-act/#
