@@ -1,22 +1,21 @@
+# first, change the working directory in line 3 to the location where the original CSV file is
+# then change the file_path name in line 6 to the name of the CSV 
 setwd("C:/DataVisualization/DV_FinalProject/00 Doc")
-# file_path <- "Sample - Superstore - English (Extract).csv"
-# measures <- c("Customer_ID", "Discount", "Number_of_Records", "Order_ID", "Order_Quantity", "Product_Base_Margin", "Profit", "Sales", "Shipping_Cost", "Unit_Price" )
 
-# file_path <- "Sample - Superstore Subset (Excel).csv"
-# measures <- c("Row_ID", "Discount", "Unit_Price", "Shipping_Cost", "Customer_ID", "Product_Base_Margin", "Postal_Code", "Profit", "Quantity_ordered_new", "Sales", "Order_ID")
-
-#file_path <- "Advanced Crosstabs - Superstore Subset (Excel).csv"
-#measures <- c("Customer_ID", "Order_ID", "Postal_Code", "Row_ID", "Number_of_Records", "Order_Quantity", "Product_Base_Margin", "Profit", "Sales", "Shipping_Cost", "Unit_Price", "Discount", "Gross_Profit_Ratio")
-
+# highlight and run everything up to line 17 and get a list of measures from the data
 file_path <- "Apple.csv"
+# replace the list of measures in line 8 with those from the output that you just received
 measures <- c("Open", "High", "Low", "Close", "Volume", "Adj_Close")
 
+# run the entire script, and you will produce a clean verison of the CSV file
+# copy the SQL code produced to create a table in Oracle.
 df <- read.csv(file_path, stringsAsFactors = FALSE)
 
 # Replace "." (i.e., period) with "_" in the column names.
 names(df) <- gsub("\\.+", "_", names(df))
 
-str(df) # Uncomment this to get column types to use for getting the list of measures.
+str(df)
+# dont' go past this line for step 1
 
 # Get rid of special characters in each column.
 # Google ASCII Table to understand the following:
@@ -53,7 +52,7 @@ write.csv(df, paste(gsub(".csv", "", file_path), ".reformatted.csv", sep=""), ro
 tableName <- gsub(" +", "_", gsub("[^A-z, 0-9, ]", "", gsub(".csv", "", file_path)))
 sql <- paste("CREATE TABLE", tableName, "(\n-- Change table_name to the table name you want.\n")
 for(d in dimensions) {
-   sql <- paste(sql, paste(d, "varchar2(4000),\n"))
+  sql <- paste(sql, paste(d, "varchar2(4000),\n"))
 }
 for(m in measures) {
   if(m != tail(measures, n=1)) sql <- paste(sql, paste(m, "number(38,4),\n"))

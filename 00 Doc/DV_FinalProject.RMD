@@ -1,0 +1,215 @@
+<!-- rmarkdown v1 -->
+  
+# Final Project
+  
+### Created by Asif Chowdhury, Justin Owens, Jash Choraria
+  
+This is the final project for CS 329E Elements of Data Visualizations with Dr. Philip Cannata. 
+The data we will utilize comes Google Finance.
+The topic is exploring the relationship between three major technology companies in the marketplace: Google, Apple and Microsoft.
+The goals for this project are to demonstrate what we have learned using R and Tableau by analyzing this financial data and creating a reproducible set of interesting data visualizations.
+
+In order to reproduce this project, please follow the following instructions.
+
+## Step 1
+
+#### Load the correct packages into R
+
+Use the following code to load the correct packages into RStudio.
+It might be necessary to install them manually if they have never been installed on your machince prior to this experience.
+Be sure to read the message log to determine if it is necessary to do so.
+
+```{r message = FALSE}
+source("../00 Doc/Packages.R", echo = TRUE)
+```
+
+## Step 2
+
+#### Clean up the CSV files
+
+Sometimes, the data in a CSV file is incompatible with Oracle. In this situation, we would want to clean up the data. 
+Look at the code in "Reformatting Data.R" in the 00 Doc folder, and modify the code as suggested in the comments, hen run the code in order to get rid of special characters and set data types to those that are compatible with Oracle. 
+You should now have a new CSV File with the reformatted data. Repeat this for all CSV files, modifying the file as needed.
+
+If you do this for all three of our files ("Apple.csv", "MSFT.csv", "Google.csv"), you will also get the SQL code to create a table used in the next step.
+
+## Step 3
+
+#### Import Data to Oracle
+
+We need to upload the cleaned CSV files into Oracle.
+
+Begin by opening oracle and initiating the connection to the database.
+Open up an SQL Worksheet. Copy each of the SQL codes produced in Step2 into the worksheet. Change the Names of the tables to something more palatable than the default and run the script.
+If done correctly, you should now have three new tables.
+
+Import the data to the tables using the respective REFORMATTED CSV files. They should have been written to the same folder as the original CSV file. You should not get any errors if you completed the process correctly, making sure that the data is imported to the currenct columns.
+
+## Step 4
+
+#### Modify dates in Oracle
+
+Unfortunately, we ran into some problems with our data while working with it in Tableau and discovered that Step 2 does not actually format dates as Date type data for Oracle. To work around this, we had to run a SQL statement to make a new column and format the old date using the TO_DATE function.
+
+Run the following code in Oracle for EACH of the tables, replacing "APPLE" with the table name and "DATE_APPLE" with the correct column name: 
+
+ALTER TABLE APPLE
+ADD Y DATE;
+
+UPDATE APPLE
+SET Y = TO_DATE(DATE_APPLE, 'mm-dd-yyyy');
+
+ALTER TABLE APPLE DROP COLUMN DATE_APPLE;
+ALTER TALBE APPLE RENAME COLUMN Y TO DATE_APPLE;
+
+This code changes dates from VarChar2 to Date type data which is necessary for easy use in Tableau.
+We are finally finished cleaning up and importing the data for analysis.
+
+## Step 5
+
+#### Retrieve data via RStudio
+
+We will work with the newly imported data first in RStudio.
+
+Before creating any visualizations, it is necessary to retrieve the data.
+
+Use the following script to retrieve the data for the Apple, Google, and Microsoft stocks from Oracle:
+
+For Apple:
+```{r message = FALSE}
+source("../00 Doc/GetAppleData.r", echo = TRUE)
+```
+
+For Google:
+```{r message = FALSE}
+source("../00 Doc/GetGoogleData.r", echo = TRUE)
+```
+
+For Microsoft:
+```{r message = FALSE}
+source("../00 Doc/GetMSFTData.r", echo = TRUE)
+```
+
+All of the data should now be imported.
+
+If you look closely at the codes to retrieve the Apple and Microsoft data, you can see that we altered to embedded SQL statement to filter by dates. This is because Google went public after both Apple and Microsoft. For easy data blending, this filter was necessary to make each table have an equal amount of rows.
+
+Next, we can use a bit of data-wrangling to combine the data frames for analysis.
+
+## Step 6
+
+#### Combine the data frames
+
+In order to make the visualization for analysis, we need to combine the data frames and get only the columns we want.
+
+Each of the date columns in each data frame is named differently, so we can standardize the columnn names to "DATE" for joining by using the following code:
+
+```{r message = FALSE}
+source("../00 Doc/ChangeColumnNames.r", echo = TRUE)
+```
+
+Now each of the data frames has a "DATE" column that we use for joining.
+
+For a basic analysis (we will do more complicated analyses in Tableau in later steps), we want to join the data frames to get the adjusted closing price for stocks for each day. This new "DATE" column will come in handy for doing just that.
+
+Use the following code to create a joined data frame, which we have named "CombinedDF":
+
+```{r message = FALSE}
+source("../00 Doc/CombineDF.r", echo = TRUE)
+```
+
+We now have a dataframe that we can use for visualizations of the data to compare the closing stock prices across time for Google, Apple and Microsoft.
+
+## Step 7
+
+#### Visualize the data in RStudio
+
+With our newly created data frame, we thought it would be an excellent idea to simply plot the closing stock prices for each company on one graph. In order to do this, we need to use the melt function in the reshape2 package. This will help us create a single graph with multiple lines for each company.
+
+The code to do so is the following:
+
+```{r message = FALSE}
+source("../00 Doc/LineOfAdj_Close.r", echo = TRUE)
+```
+
+**Insert observations here**
+
+With this melted data frame, we can also create scatterplots to compare each company's adjusted closing prices.
+
+Use the following code to reproduce these scatterplots with trendlines:
+
+Apple vs. Microsoft
+```{r message = FALSE}
+source("../00 Doc/ScatterAM.r", echo = TRUE)
+```
+
+Apple vs. Google
+```{r message = FALSE}
+source("../00 Doc/ScatterAG.r", echo = TRUE)
+```
+
+Google vs. Microsoft
+```{r message = FALSE}
+source("../00 Doc/ScatterGM.r", echo = TRUE)
+```
+
+In addition to the scatterplots, it might be useful to know the correlation coefficients and linear models for these comparisons.
+
+```{r message = FALSE}
+source("../00 Doc/Correlations.r", echo = TRUE)
+```
+
+**Insert observations here**
+
+## Step 8
+
+#### Retrieve data via Oracle
+
+Now that we have done some basic visualizations in RStudio, we can start doing some more complicated procedures in Tableau.
+First we need to retrieve the data in Tableau.
+
+1) Open Tableau.
+
+2) Click Connect to "Oracle" underneath the Connect heading on the left side of the screen.
+
+3) In the screen that appears, enter the required information:
+
+For our project, you will need to replace "uteid" with "jdo589", "ac52722", "jc58247" for the Apple, Google and Microsoft datasets, respectively:
+  
+![Oracle Log In Info](../00 Doc/OracleInfo.png)
+
+Once you have completed this three times, you should have correctly imported the three datasets to Tableau.
+
+## Step 9
+
+#### Create the relationships
+
+Data blending is essentially combining data from multiple data sources, and this is exactly what we are doing for our analysis. We did not use the joining function in Tableau because our datasets are not stored in the same location.
+
+For our data, we needed to create a relationship between the dates in each table.
+
+Go to Data>Edit Relationships.
+Make sure the primary data source is the Google source and the secondary source is the Apple source.
+Click the add button and create the relation ship with "Date Google" and "Date Apple".
+Repeat by changing the secondary data source to the Microsoft source and creating a relationship between "Date Google" and "Date Apple".
+
+The relationships should look like this:
+
+
+![Relationships 1](../00 Doc/Relationships1.png)
+
+
+![Relationships 2](../00 Doc/Relationships2.png)
+
+
+You should now be able to blend the data sources successfully for analysis.
+
+## Step 10
+
+#### Visualize the data in Tableau
+
+The visualizations can be recreated by dragging the correct Dimensions and Measures to the proper places as decribed in the following pictures and completing all the steps outlined beneath each screenshot below.
+
+For each visual, be sure to click on the new sheet button so that you can save each of your visualizations.
+
+Also pay attention to any calculations that we have created.
