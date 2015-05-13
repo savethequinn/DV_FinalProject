@@ -6,7 +6,7 @@
   
 This is the final project for CS 329E Elements of Data Visualizations with Dr. Philip Cannata. 
 The data we will utilize comes Google Finance.
-The topic is exploring the relationship between three major technology companies in the marketplace: Google, Apple and Microsoft.
+The topic is exploring the relationship between three major technology companies in the marketplace: Google, Apple and Microsoft from 2004 to present 2015.
 The goals for this project are to demonstrate what we have learned using R and Tableau by analyzing this financial data and creating a reproducible set of interesting data visualizations.
 
 In order to reproduce this project, please follow the following instructions.
@@ -17,10 +17,10 @@ In order to reproduce this project, please follow the following instructions.
 
 Use the following code to load the correct packages into RStudio.
 It might be necessary to install them manually if they have never been installed on your machince prior to this experience.
-Be sure to read the message log to determine if it is necessary to do so.
+Be sure to read the message log to determine if it is necessary to do so because the in this file will not work without them.
 
 ```{r message = FALSE}
-source("../00 Doc/Packages.R", echo = TRUE)
+source("../01 Data/Packages.R", echo = TRUE)
 ```
 
 ## Step 2
@@ -28,8 +28,8 @@ source("../00 Doc/Packages.R", echo = TRUE)
 #### Clean up the CSV files
 
 Sometimes, the data in a CSV file is incompatible with Oracle. In this situation, we would want to clean up the data. 
-Look at the code in "Reformatting Data.R" in the 00 Doc folder, and modify the code as suggested in the comments, hen run the code in order to get rid of special characters and set data types to those that are compatible with Oracle. 
-You should now have a new CSV File with the reformatted data. Repeat this for all CSV files, modifying the file as needed.
+Look at the code in "Reformatting Data.R" in the 01 Data folder, and modify the code as suggested in the comments, then run the code in order to get rid of special characters and set data types to those that are compatible with Oracle. 
+You should now have a new CSV File with the reformatted data stored in the same folder as the original CSV file. Repeat this for all CSV files, modifying the file as needed.
 
 If you do this for all three of our files ("Apple.csv", "MSFT.csv", "Google.csv"), you will also get the SQL code to create a table used in the next step.
 
@@ -39,17 +39,18 @@ If you do this for all three of our files ("Apple.csv", "MSFT.csv", "Google.csv"
 
 We need to upload the cleaned CSV files into Oracle.
 
-Begin by opening oracle and initiating the connection to the database.
+Begin by opening Oracle and initiating the connection to the database.
 Open up an SQL Worksheet. Copy each of the SQL codes produced in Step2 into the worksheet. Change the Names of the tables to something more palatable than the default and run the script.
+
 If done correctly, you should now have three new tables.
 
-Import the data to the tables using the respective REFORMATTED CSV files. They should have been written to the same folder as the original CSV file. You should not get any errors if you completed the process correctly, making sure that the data is imported to the currenct columns.
+Import the data to the tables using the respective REFORMATTED CSV files. They should have been written to the same folder as the original CSV file. You should not get any errors if you completed the process correctly, making sure that the data is imported to the correct columns.
 
 ## Step 4
 
 #### Modify dates in Oracle
 
-Unfortunately, we ran into some problems with our data while working with it in Tableau and discovered that Step 2 does not actually format dates as Date type data for Oracle. To work around this, we had to run a SQL statement to make a new column and format the old date using the TO_DATE function.
+Unfortunately, we ran into some problems with our data while working with it in Tableau and discovered that Step 2 does not actually format dates as Date type data for Oracle. Rather, it formats dates at VarChar2, which is not very compatible with Tableau. To work around this, we had to run a SQL statement to make a new column and format the old date using the TO_DATE function.
 
 Run the following code in Oracle for EACH of the tables, replacing "APPLE" with the table name and "DATE_APPLE" with the correct column name: 
 
@@ -60,7 +61,8 @@ UPDATE APPLE
 SET Y = TO_DATE(DATE_APPLE, 'mm-dd-yyyy');
 
 ALTER TABLE APPLE DROP COLUMN DATE_APPLE;
-ALTER TALBE APPLE RENAME COLUMN Y TO DATE_APPLE;
+
+ALTER TABLE APPLE RENAME COLUMN Y TO DATE_APPLE;
 
 This code changes dates from VarChar2 to Date type data which is necessary for easy use in Tableau.
 We are finally finished cleaning up and importing the data for analysis.
@@ -75,19 +77,19 @@ Before creating any visualizations, it is necessary to retrieve the data.
 
 Use the following script to retrieve the data for the Apple, Google, and Microsoft stocks from Oracle:
 
-For Apple:
+**For Apple:**
 ```{r message = FALSE}
-source("../00 Doc/GetAppleData.r", echo = TRUE)
+source("../01 Data/GetAppleData.r", echo = TRUE)
 ```
 
-For Google:
+**For Google:**
 ```{r message = FALSE}
-source("../00 Doc/GetGoogleData.r", echo = TRUE)
+source("../01 Data/GetGoogleData.r", echo = TRUE)
 ```
 
-For Microsoft:
+**For Microsoft:**
 ```{r message = FALSE}
-source("../00 Doc/GetMSFTData.r", echo = TRUE)
+source("../01 Data/GetMSFTData.r", echo = TRUE)
 ```
 
 All of the data should now be imported.
@@ -105,7 +107,7 @@ In order to make the visualization for analysis, we need to combine the data fra
 Each of the date columns in each data frame is named differently, so we can standardize the columnn names to "DATE" for joining by using the following code:
 
 ```{r message = FALSE}
-source("../00 Doc/ChangeColumnNames.r", echo = TRUE)
+source("../02 Data Wrangling/ChangeColumnNames.r", echo = TRUE)
 ```
 
 Now each of the data frames has a "DATE" column that we use for joining.
@@ -115,51 +117,70 @@ For a basic analysis (we will do more complicated analyses in Tableau in later s
 Use the following code to create a joined data frame, which we have named "CombinedDF":
 
 ```{r message = FALSE}
-source("../00 Doc/CombineDF.r", echo = TRUE)
+source("../02 Data Wrangling/CombineDF.r", echo = TRUE)
 ```
 
 We now have a dataframe that we can use for visualizations of the data to compare the closing stock prices across time for Google, Apple and Microsoft.
 
 ## Step 7
 
-#### Visualize the data in RStudio
+#### Use Data Wrangling to Visualize the data in RStudio
 
 With our newly created data frame, we thought it would be an excellent idea to simply plot the closing stock prices for each company on one graph. In order to do this, we need to use the melt function in the reshape2 package. This will help us create a single graph with multiple lines for each company.
 
 The code to do so is the following:
 
 ```{r message = FALSE}
-source("../00 Doc/LineOfAdj_Close.r", echo = TRUE)
+source("../02 Data Wrangling/LineOfAdj_Close.r", echo = TRUE)
 ```
 
-**Insert observations here**
+From this line graph, we can see that the adjusted closing prices of Google vary a lot more than those of Apple and Microsoft and Google stocks seem to be worth quite a lot. As mentioned previously, the data progresses linearly through time from August 2004 to Early 2015, so we can observe the changes in the market over time. In addition, it seems that Apple and Microsoft have switched places in the market space with Apple currently having a high stock price than Microsoft. We can notice large spikes in the graph that we may be able to explain with further observation.
 
 With this melted data frame, we can also create scatterplots to compare each company's adjusted closing prices.
 
 Use the following code to reproduce these scatterplots with trendlines:
 
-Apple vs. Microsoft
+**Apple vs. Microsoft**
 ```{r message = FALSE}
-source("../00 Doc/ScatterAM.r", echo = TRUE)
+source("../02 Data Wrangling/ScatterAM.r", echo = TRUE)
 ```
 
-Apple vs. Google
+**Apple vs. Google**
 ```{r message = FALSE}
-source("../00 Doc/ScatterAG.r", echo = TRUE)
+source("../02 Data Wrangling/ScatterAG.r", echo = TRUE)
 ```
 
-Google vs. Microsoft
+**Google vs. Microsoft**
 ```{r message = FALSE}
-source("../00 Doc/ScatterGM.r", echo = TRUE)
+source("../02 Data Wrangling/ScatterGM.r", echo = TRUE)
 ```
 
-In addition to the scatterplots, it might be useful to know the correlation coefficients and linear models for these comparisons.
+From these scatterplots, we can see that there is some sort of positive relationship between all of adjusted closing prices of the companies. There are definitely some patterns in the data, so it would probably be useful to transform the data for a more accurate and meaningful analysis (we will not be doing so for the purpose of this project). 
+
+It seems that Apple and Microsoft have some sort of competition because in the first graph featuring the two companies, there seems to be a lot of variation around the trendlines moving back and forth. To the furthest right of the graph, there is a cluster of the highest Apple prices where the trend in Microsoft prices seems to be disconnect from the rest of the pattern.
+
+In the second plot, there is also a cluster of higher Apple prices where it seems the Google price is not its highest. This could possibly suggest times where Apple appeared more dominant in the market than usual. We could possibly filter this data by time to see the dates of those clusters of data. You can almost see a swirling pattern in thise graph as well, also possibly suggesting some competition between Apple and Google.
+
+The final scatterplot features Microsoft and Google. This graph seems to have the most linear pattern. At the furthest left of the graph, there seems to be a split in the data, rivaled by an exponential trend in the far right of the graph. We can see a cluster of most of the data around a value of 250 for Google and 25 for Microsoft.
+
+Notice that we used a gradient scale to color the data based on Apple's ajusted closing price. This was to have a "base comparison" between all of the scatterplots.
+
+In addition to the scatterplots, it might be useful to know the correlation coefficients and linear models for these comparisons. We can obtain these using the following code:
 
 ```{r message = FALSE}
-source("../00 Doc/Correlations.r", echo = TRUE)
+source("../02 Data Wrangling/Correlations.r", echo = TRUE)
 ```
 
-**Insert observations here**
+The correlation between **Apple** and Google: 0.8739
+Slope: .2125
+
+The correlation between **Apple** and Microsoft: 0.8491
+Slope: 3.8218
+
+The correlation between **Microsoft** and Google: 0.9137 
+Slope: .0494
+
+These correlations are all high, but it does not really prove to be too significant because there are patterns in the scatterplots.
 
 ## Step 8
 
@@ -184,7 +205,7 @@ Once you have completed this three times, you should have correctly imported the
 
 #### Create the relationships
 
-Data blending is essentially combining data from multiple data sources, and this is exactly what we are doing for our analysis. We did not use the joining function in Tableau because our datasets are not stored in the same location.
+Data blending is essentially combining data from multiple data sources, and this is exactly what we are doing for our analysis. We did not use the joining function in Tableau for this project.
 
 For our data, we needed to create a relationship between the dates in each table.
 
@@ -213,13 +234,13 @@ The visualizations can be recreated by dragging the correct Dimensions and Measu
 Because there are at least 40 graphs in our final Tableau Workbook, we will explain how to create one graph per topic and note how to recreate the graphs for each company.
 
 
-###Topic 1: Volatility
+**Topic 1: Volatility**
 
-The first section we will discuss is the idea of volatility of a particular company's stocks.
+The first section we will discuss is the idea of volatility of a particular company's stocks. Volitility is the idea of magnitude of fluctuation in the marketplace. Graphs with higher volatility are more undpredictable in a sense.
 
 Recreate the following graph: 
 
-![Apple Volatility](../00 Doc/TableauFigures/Figure1.png)
+![Apple Volatility](../00 Doc/TableauFigures/VolExample.png)
 
 As you can see, this is a line graph of the volume and and ajusted closing price of the stocks for Apple on October 11-15 in 2004 a period of notable volume of trades.
 
@@ -242,20 +263,20 @@ You can simply change the filter on the dates and modify the formulas for the co
 
 In a need for simplicity, we will only display condensed dashboards separated by company for all three years.
 
-![Apple Volatility Dashboard](../00 Doc/TableauFigures/Figure4.png)
+![Apple Volatility Dashboard](../00 Doc/TableauFigures/AppleVol.png)
 
-![Google Volatility Dashboard](../00 Doc/TableauFigures/Figure12.png)
+![Google Volatility Dashboard](../00 Doc/TableauFigures/GoogleVol.png)
 
-![MSFT Volatility Dashboard](../00 Doc/TableauFigures/Figure20.png)
+![MSFT Volatility Dashboard](../00 Doc/TableauFigures/MSFTVol.png)
 
 
-###Topic 2: Difference Between High and Low Prices
+**Topic 2: Difference Between High and Low Prices**
 
 The second topic discusses the difference between the high and low prices for particular months in relation to the volume changes and price changes.
 
 Recreate the following graph:
 
-![Google HL Graph](../00 Doc/TableauFigures/Figure13.png)
+![Google HL Graph](../00 Doc/TableauFigures/HLExample.png)
 
 If you look at this line graph concerning Google, you will also notice a relationship between the Difference between the high and low prices for a day and the volume of the trading that day in October.
 
@@ -263,16 +284,51 @@ In order to recreate this graph, you will need to use the calculations from the 
 
 Just as before, we will only show an example of this topic for one company and year, but you can recreate the other graphs by changing the filters and using the appropriate calculations that you created in the previous step. We will show the condensed version in a dashboard format below.
 
-![Apple HL Dashboard](../00 Doc/TableauFigures/Figure8.png)
+![Apple HL Dashboard](../00 Doc/TableauFigures/AppleHL.png)
 
-![Google HL Dashboard](../00 Doc/TableauFigures/Figure16.png)
+![Google HL Dashboard](../00 Doc/TableauFigures/GoogleHL.png)
 
-![MSFT HL Dashboard](../00 Doc/TableauFigures/Figure24.png)
-
-
-###Topic 3: Correlation
-
-The third topic centers around a relationship between the
+![MSFT HL Dashboard](../00 Doc/TableauFigures/MSFTHL.png)
 
 
+**Topic 3: Correlation**
+
+The third topic centers around a relationship between the stock price changes for two companies across quarters and the difference in those differences.
+
+Recreate the following graph:
+
+![Correlation Apple MSFT](../00 Doc/TableauFigures/CorExample.png)
+
+This graph shows let us visualize the movements in percent changes of stock price from the previous period and compare how that price change stack up against another company.
+
+In order to recreate this graph, you will need to add one more calculation-
+
+[Diff Price Percent Apple]+[MSFT (C##CS329E_JC52347)].[Diff Price Percent MSFT]
+
+Once again, we will only provide one detailed example, but show the dashboard containing all the correlations between each company.
+
+![Apple MSFT Cor Dashboard](../00 Doc/TableauFigures/CorDBAM.png)
+
+![Apple Google Cor Dashboard](../00 Doc/TableauFigures/CorDBAG.png)
+
+![Microsoft Dashboard](../00 Doc/TableauFigures/CorDBMG.png)
+
+
+**Topic 4: Average Adjusted Price and Differences**
+
+The fourth and final topic is the relationship between the average stock prices over a quarter and their changes from quarter to quarter. We will compare these observations across the companies.
+
+![Avg Adj Price and Diff](../00 Doc/TableauFigures/AdjPrice.png)
+
+Be sure to use the AVERAGE adjusted closing price in your calculations by right clicking on the adjusted closing price pill and choosing Measure>Average.
+
+This topic only contains this single graph, but this graph holds a lot of power in the fact that it can compare price changes during quarters so that we can easily visualize the potential effects of one company on another.
+
+As you can see, each row of graphs shows the average adjusted closing price for each company along with the percentage change, and the columns separate the data by year and quarter.
+
+You can see that as a whole over 2007, all companies experienced positive growth, but mid-2008, it is obvious that there was an effect on the market by the start of the financial crisis.
+
+Fortunately, it seems that things started to turn around in the beginning of 2009 and continued to improve.
+
+Notice that between 2009 and 2010, it seems as if Apple's average adjusted stock price continued to rise while Microsoft and Google's declined. This might be because the first iPad was released and became the first tablet to dominate the marketplace. 
 
