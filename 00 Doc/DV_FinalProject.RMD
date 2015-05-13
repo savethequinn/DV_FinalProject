@@ -208,8 +208,71 @@ You should now be able to blend the data sources successfully for analysis.
 
 #### Visualize the data in Tableau
 
-The visualizations can be recreated by dragging the correct Dimensions and Measures to the proper places as decribed in the following pictures and completing all the steps outlined beneath each screenshot below.
+The visualizations can be recreated by dragging the correct Dimensions and Measures to the proper places as decribed in the following pictures and completing all the steps outlined beneath each screenshot below while paying attention to any calculations we may have created.
 
-For each visual, be sure to click on the new sheet button so that you can save each of your visualizations.
+Because there are at least 40 graphs in our final Tableau Workbook, we will explain how to create one graph per topic and note how to recreate the graphs for each company.
 
-Also pay attention to any calculations that we have created.
+
+###Topic 1: Volatility
+
+The first section we will discuss is the idea of volatility of a particular company's stocks.
+
+Recreate the following graph: 
+
+![Apple Volatility](../00 Doc/TableauFigures/Figure1.png)
+
+As you can see, this is a line graph of the volume and and ajusted closing price of the stocks for Apple on October 11-15 in 2004 a period of notable volume of trades.
+
+In order to create this graph, we also created calculations of the following fashion-
+
+(SUM([Adj Close Apple]) - Lookup(SUM([Adj Close Apple]), -1)) / Lookup(SUM([Adj Close Apple]), -1)
+
+This finds the percentage change of the adjusted closing price from the previous day.
+
+(SUM([Volume Apple]) - Lookup(SUM([Volume Apple]), -1)) / Lookup(SUM([Volume Apple]), -1)
+
+This formula finds the percentage change of the volume from the previous day.
+
+Through the graph, we notice a relationship in the the percentage change in volume traded and the percentage change of the adjusted closing prices.
+
+For example: in this graph, the change in volume from Oct 13 to Oct 14 was quite drastic and it seems to be related to a drastic change in the adjusted closing price as well.
+In addition to this graph, we have multiple graphs on this topic of volatility for each company for the years 2004, 2008 and 2012.
+
+You can simply change the filter on the dates and modify the formulas for the companies specific adjusted closing and volume data values in order to recreate all of these graphs.
+
+In a need for simplicity, we will only display condensed dashboards separated by company for all three years.
+
+![Apple Volatility Dashboard](../00 Doc/TableauFigures/Figure4.png)
+
+![Google Volatility Dashboard](../00 Doc/TableauFigures/Figure12.png)
+
+![MSFT Volatility Dashboard](../00 Doc/TableauFigures/Figure20.png)
+
+
+###Topic 2: Difference Between High and Low Prices
+
+The second topic discusses the difference between the high and low prices for particular months in relation to the volume changes and price changes.
+
+Recreate the following graph:
+
+![Google HL Graph](../00 Doc/TableauFigures/Figure13.png)
+
+If you look at this line graph concerning Google, you will also notice a relationship between the Difference between the high and low prices for a day and the volume of the trading that day in October.
+
+In order to recreate this graph, you will need to use the calculations from the volatility section. Luckily, they have already been made if you have followed this project in a linear progression.
+
+Just as before, we will only show an example of this topic for one company and year, but you can recreate the other graphs by changing the filters and using the appropriate calculations that you created in the previous step. We will show the condensed version in a dashboard format below.
+
+![Apple HL Dashboard](../00 Doc/TableauFigures/Figure8.png)
+
+![Google HL Dashboard](../00 Doc/TableauFigures/Figure16.png)
+
+![MSFT HL Dashboard](../00 Doc/TableauFigures/Figure24.png)
+
+
+###Topic 3: Correlation
+
+The third topic centers around a relationship between the
+
+
+
